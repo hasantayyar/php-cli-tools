@@ -1,0 +1,68 @@
+<?php
+class {{classname}} {
+
+    {{vars}}
+    private $table = '{{table_name}}';
+    public static $instance;
+
+    /**
+     * 
+     * @return {{classname}}
+     */
+    public static function getInstance() {
+        if (self::$instance === NULL){
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    {{construct_function}}
+    
+    public function loadObject($row){
+         if (empty($row)) {
+            return FALSE;
+        }
+        {{loadobjectvars}}
+        return $this;
+    }
+
+    /**
+     * soft delete a record. update status field to -1
+     * @param int $id
+     * @return bool
+     */
+    function delete_soft($id) {
+        $query = MySQL::getInstance()->prepare("UPDATE `" . $this->table . "` SET status=-1 WHERE id=:id");
+        $query->bindValue(':id', $id, PDO::PARAM_INT);
+        return $query->execute();
+    }
+    
+    /**
+     * delete from db
+     * @param int $id
+     * @return bool
+     */
+    function delete($id) {
+        $query = MySQL::getInstance()->prepare("DELETE FROM  `" . $this->table . "` WHERE id=:id");
+        $query->bindValue(':id', $id, PDO::PARAM_INT);
+        return $query->execute();
+    }
+
+    function get{{classname}}($id, $as_array = TRUE) {
+        $query = MySQL::getInstance()->prepare("SELECT * FROM  `" . $this->table . "` WHERE id =:id LIMIT 1");
+        $query->bindValue(':id', $id, PDO::PARAM_INT);
+        $query->execute();
+        $row = $query->fetch(PDO::FETCH_ASSOC);
+        return !$row ? false : $as_array ? $row : $this->load_object($row);
+    }
+
+    function getAll($status = 'all') {
+        $query_string = $status == 'all' ? 'SELECT * FROM `' . $this->table . '`' :
+                'SELECT * FROM `' . $this->table . '` WHERE status=' . $status;
+        $query = MySQL::getInstance()->prepare($query_string);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+}
