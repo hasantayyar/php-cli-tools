@@ -1,5 +1,8 @@
 #!/usr/bin/php
 <?php
+/**
+ * @todo add option for output type
+ */
 $salt = isset($argv[1]) ? $argv[1] : rand(100000, 999999);
 
 function generate_color($salt) {
