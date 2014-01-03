@@ -1,0 +1,14 @@
+#!/usr/bin/php
+<?php
+$salt = isset($argv[1]) ? $argv[1] : rand(100000, 999999);
+
+function generate_color($salt) {
+    $hash = md5($salt);
+    return "rgb(" . implode(',', array(
+                hexdec(substr($hash, 0, 2)), // r
+                hexdec(substr($hash, 2, 2)), // g
+                hexdec(substr($hash, 4, 2))) //b
+            ) . ')';
+}
+
+echo "\nRGB : " . generate_color($salt) . "\n\n";
